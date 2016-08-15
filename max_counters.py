@@ -68,11 +68,9 @@ expected worst-case space complexity is O(N), beyond input storage (not counting
 Elements of input arrays can be modified.
 """
 
-N = 5
-A = [3,4,4,6,1,4,4]
 
-def solution(N, A):
-    # 
+def solution_66(N, A):
+    # this was slow, so it was failed at time complexity part and stuck at 66 %
     Np1 = N + 1
     C = [0 for i in range(Np1)]
     high = 0
@@ -85,6 +83,37 @@ def solution(N, A):
             C = [high for i in range(Np1)]
     return C[1:]
 
+def solution(N, A):
+    # https://codility.com/demo/results/trainingGEMA5F-333/
+    Np1 = N + 1
+    class Count(object):
+        __slots__ = ['counter', 'high', 'ver']
+        def __init__(self):
+            self.counter = 0
+            self.high = 0
+            self.ver = 0
+    C = dict([(i,Count()) for i in range(Np1)])
+    G_current_high = 0
+    G_high_ver = 0
+    last_applied_high = 0
+    for i in A:
+        if i >= 1 and i <= N:
+            c = C[i]
+            if c.ver != G_high_ver:
+                c.ver = G_high_ver
+                c.counter = last_applied_high + 1
+            else:
+                c.counter += 1
+            if c.counter > G_current_high:
+                G_current_high = c.counter
+        elif i == Np1:
+            G_high_ver += 1
+            last_applied_high = G_current_high
+    return [c.counter if c.counter > last_applied_high else last_applied_high for c in C.values()[1:]]
+
+
+N = 5
+A = [3,4,4,6,1,4,4]
 
 print(solution(N, A))
 print(solution(N, A) ==  [3, 2, 2, 4, 2])
